@@ -23,8 +23,6 @@ public class Solution
             min_x++;
             min_y++;
 
-
-
             for (int i = min_x; i <= max_x; i++)
             {
                 map[max_y, i] = index++;
