@@ -17,14 +17,6 @@ public class Solution
             return a;
         }
 
-        public static BoardPoint operator -(BoardPoint a, BoardPoint b)
-        {
-            a.Y -= b.Y;
-            a.X -= b.X;
-
-            return a;
-        }
-
         public static BoardPoint operator *(BoardPoint a, int b)
         {
             a.Y *= b;
@@ -53,85 +45,59 @@ public class Solution
             Y = y;
             X = x;
         }
+
+        public BoardPoint Copy()
+        {
+            return new BoardPoint(Y, X);
+        }
     }
     
-    private Dictionary<char, List<BoardPoint>> BoardCompDic { get; set; }
-    private Dictionary<BoardPoint, List<BoardPoint>> VisitedBoardPointDic { get; set; }
+    private static Dictionary<char, List<BoardPoint>> BoardCompDic { get; set; }
+    private static Dictionary<BoardPoint, List<BoardPoint>> VisitedBoardPointDic { get; set; }
 
-    private int MaxCount_X { get; set; }
-    private int MaxCount_Y { get; set; }
+    private static int MaxCount_X { get; set; }
+    private static int MaxCount_Y { get; set; }
+
+    private static Queue<BoardPoint> MovedPointQue { get; set; }
     
     public int solution(string[] board) 
     {
         BoardCompDic = GetBoardCompDic(board);
-    VisitedBoardPointDic = new Dictionary<BoardPoint, List<BoardPoint>>();
-    MaxCount_X = board[0].Length - 1;
-    MaxCount_Y = board.Length - 1;
+        VisitedBoardPointDic = new Dictionary<BoardPoint, List<BoardPoint>>();
 
-    var currPointList = Moving(BoardCompDic['R'][0]);
+        MaxCount_X = board[0].Length - 1;
+        MaxCount_Y = board.Length - 1;
 
-    int answer = 1;
-    while (!currPointList.Contains(BoardCompDic['G'][0]))
-    {
-        currPointList = Moving(currPointList);
+        int answer = 0;
 
-        if(currPointList.Count == 0)
+        MovedPointQue = new Queue<BoardPoint>();
+        MovedPointQue.Enqueue(BoardCompDic['R'][0]);
+
+        while (!MovedPointQue.Contains(BoardCompDic['G'][0]))
         {
-            answer = -1;
-            break;
-        }
-        else answer++;
-    }
+            int cnt = MovedPointQue.Count;
 
-    return answer;
-    }
-    
-    private List<BoardPoint> Moving(List<BoardPoint> beforePointList)
-    {
-        List<BoardPoint> list = new List<BoardPoint>();
-
-        foreach (var item in beforePointList)
-        {
-            list.AddRange(Moving(item));
-        }
-
-        return list;
-    }
-    
-    private List<BoardPoint> Moving(BoardPoint beforePoint)
-    {
-        List < BoardPoint > valList = new List<BoardPoint>();
-
-        List<BoardPoint> movingPointList = new List<BoardPoint>() 
-        {
-            new BoardPoint(-1, 0),
-            new BoardPoint(0, +1),
-            new BoardPoint(0, -1),
-            new BoardPoint(+1, 0),
-        };
-
-        foreach (BoardPoint movingPoint in movingPointList)
-        {
-            BoardPoint tempPoint = MovingByDirection(beforePoint, movingPoint);
-
-            if (beforePoint != tempPoint)
+            for (int i = 0; i < cnt; i++)
             {
-                VisitedBoardPointDic.TryAdd(tempPoint, new List<BoardPoint>());
+                var beforePoint = MovedPointQue.Dequeue();
 
-                if (!VisitedBoardPointDic[tempPoint].Contains(beforePoint))
-                {
-                    valList.Add(tempPoint);
-
-                    VisitedBoardPointDic[tempPoint].Add(beforePoint);
-                }
+                AddMovedPointQueByDirection(beforePoint, new BoardPoint(-1, 0));
+                AddMovedPointQueByDirection(beforePoint, new BoardPoint(0, +1));
+                AddMovedPointQueByDirection(beforePoint, new BoardPoint(0, -1));
+                AddMovedPointQueByDirection(beforePoint, new BoardPoint(+1, 0));
             }
+
+            if (MovedPointQue.Count == 0) return -1;
+            else answer++;
         }
 
-        return valList;
+        return answer;
     }
     
-    private BoardPoint MovingByDirection(BoardPoint point, BoardPoint movingPoint)
+    private void AddMovedPointQueByDirection(BoardPoint point, BoardPoint movingPoint)
     {
+        BoardPoint beforePoint = point.Copy();
+
         while (movingPoint.X != 0 && (movingPoint.X == +1 ? point.X != MaxCount_X : point.X != 0)
                ||
                movingPoint.Y != 0 && (movingPoint.Y == +1 ? point.Y != MaxCount_Y : point.Y != 0))
@@ -149,7 +115,22 @@ public class Solution
             }
         }
 
-        return point;
+        AddMovedPointQue(beforePoint, point);
+    }
+    
+    private void AddMovedPointQue(BoardPoint point, BoardPoint movingPoint)
+    {
+        if (point != movingPoint)
+        {
+            VisitedBoardPointDic.TryAdd(movingPoint, new List<BoardPoint>());
+
+            if (!VisitedBoardPointDic[movingPoint].Contains(point))
+            {
+                MovedPointQue.Enqueue(movingPoint);
+
+                VisitedBoardPointDic[movingPoint].Add(point);
+            }
+        }
     }
     
     private Dictionary<char, List<BoardPoint>> GetBoardCompDic(string[] board)
