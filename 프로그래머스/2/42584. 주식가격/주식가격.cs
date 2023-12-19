@@ -8,17 +8,14 @@ public class Solution
 
         for (int i = 0; i < prices.Length - 1; i++)
         {
-            int count = 1;
-
-            for (int j = i + 1; j < prices.Length - 1; j++)
+            for (int j = i + 1; j < prices.Length; j++)
             {
-                if (prices[j] < prices[i]) break;
-                else count++;
-            }
+                answer[i]++;
 
-            answer[i] = count;
+                if (prices[j] < prices[i]) break;
+            }
         }
-        
+
         return answer;
     }
 }
