@@ -13,7 +13,7 @@ public class Solution
 
         Queue<int> bridge = new Queue<int>();
 
-        while (trucks.Count != 0 || sumWeight == 0)
+        while (trucks.Count != 0)
         {
             if (bridge.Count != 0 && bridge.Count % bridge_length == 0)
             {
