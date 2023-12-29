@@ -10,24 +10,12 @@ public class Solution
 
         List<int> resultList = new List<int>(elements);
 
-        for (int i = 2; i <= elements.Length; i++)
+        for (int i = 0; i < elements.Length - 1; i++)
         {
-            for (int j = 0; j < runArr.Length; j++)
+            for (int j = 0; j < elements.Length; j++)
             {
-                if (elements.Length <= j)
-                {
-                    break;
-                }
-                else
-                {
-                    int tempVal = 0;
-                    for (int k = j; k < j + i; k++)
-                    {
-                        tempVal += runArr[k];
-                    }
-
-                    resultList.Add(tempVal);
-                }
+                int tempVal = resultList[i * elements.Length + j] + runArr[j + 1 + i];
+                resultList.Add(tempVal);
             }
         }
 
