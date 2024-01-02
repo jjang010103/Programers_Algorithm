@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
 class Solution
@@ -13,7 +12,7 @@ class Solution
             string beforeWord = words[i - 1];
             string currentWord = words[i];
 
-            if (beforeWord.Last() != currentWord.First() || usedWordList.Contains(currentWord))
+            if (beforeWord[beforeWord.Length - 1] != currentWord[0] || usedWordList.Contains(currentWord))
             {
                 return new int[] { i % n + 1, i / n + 1 };
             }
