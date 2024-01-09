@@ -4,55 +4,53 @@ using System.Linq;
 
 public class Solution 
 {
-    private Dictionary<int, List<int>> Dic { get; set; }
-
     public int solution(int n, int[,] computers) 
     {
-        this.Dic = this.GetConnNetworkDic(computers);
+        Dictionary<int, List<int>> dic = this.GetConnNetworkDic(computers);
 
-        int counter = this.RemoveSingleNetComsAtDic(this.Dic);
+        int counter = this.RemoveSingleNetComsAtDic(dic);
 
-        if (Dic.Count == 0)
+        if (dic.Count == 0)
         {
             return counter;
         }
         else
         {
-            List<int> tempList =  this.Dic[this.Dic.Keys.First()];
-            this.Dic.Remove(this.Dic.Keys.First());
+            List<int> tempList = dic[dic.Keys.First()];
+            dic.Remove(dic.Keys.First());
 
-            while (this.Dic.Count != 0)
+            while (dic.Count != 0)
             {
-                tempList = this.GetConnectComsList(tempList);
+                tempList = this.GetConnectComsList(dic, tempList);
 
                 if (tempList.Count == 0)
                 {
                     counter++;
-                    
-                    tempList = this.Dic[this.Dic.Keys.First()];
+
+                    tempList = dic[dic.Keys.First()];
                 }
             }
 
-            if (this.Dic.Count == 0) counter++;
+            if (dic.Count == 0) counter++;
 
             return counter;
         }
     }
     
-    private List<int> GetConnectComsList(List<int> beforeComList)
+    private List<int> GetConnectComsList(Dictionary<int, List<int>> dic, List<int> beforeComList)
     {
         List<int> tempList = new List<int>();
 
         foreach (int comIndex in beforeComList)
         {
-            if (this.Dic.TryGetValue(comIndex, out var valueList))
+            if (dic.TryGetValue(comIndex, out var valueList))
             {
-                tempList.AddRange(this.Dic[comIndex]);
+                tempList.AddRange(dic[comIndex]);
 
-                this.Dic.Remove(comIndex);
+                dic.Remove(comIndex);
             }
         }
-        
+
         return tempList;
     }
 
