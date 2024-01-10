@@ -1,53 +1,52 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 public class Solution 
 {
     public int solution(int n, int[,] computers) 
     {
+        int counter = 0;
+
         Dictionary<int, List<int>> dic = this.GetConnNetworkDic(computers);
 
-        int counter = this.RemoveSingleNetComsAtDic(dic);
+        bool[] visitedArr = new bool[n];
 
-        if (dic.Count == 0)
+        
+        for (int i = 0; i < n; i++)
         {
-            return counter;
-        }
-        else
-        {
-            List<int> tempList = dic[dic.Keys.First()];
-            dic.Remove(dic.Keys.First());
-
-            while (dic.Count != 0)
+            if (visitedArr[i]) continue;
+            else
             {
-                tempList = this.GetConnectComsList(dic, tempList);
+                List<int> tempList = dic[i];
 
-                if (tempList.Count == 0)
+                while (tempList.Count != 0)
                 {
-                    counter++;
-
-                    tempList = dic[dic.Keys.First()];
+                    tempList = this.GetConnectComsList(dic, visitedArr, tempList);
                 }
+
+                counter++;
             }
-
-            if (dic.Count == 0) counter++;
-
-            return counter;
         }
+
+        return counter;
     }
-    
-    private List<int> GetConnectComsList(Dictionary<int, List<int>> dic, List<int> beforeComList)
+
+    private List<int> GetConnectComsList(Dictionary<int, List<int>> dic, bool[] visitedArr, List<int> beforeComList)
     {
         List<int> tempList = new List<int>();
 
         foreach (int comIndex in beforeComList)
         {
-            if (dic.TryGetValue(comIndex, out var valueList))
+            foreach (int connectComIndex in dic[comIndex])
             {
-                tempList.AddRange(dic[comIndex]);
+                if (visitedArr[connectComIndex]) continue;
+                else
+                {
+                    visitedArr[connectComIndex] = true;
 
-                dic.Remove(comIndex);
+                    tempList.Add(connectComIndex);
+                }
+
             }
         }
 
@@ -64,31 +63,12 @@ public class Solution
 
             for (int j = 0; j < computers.GetLength(1); j++)
             {
-                if (i == j) continue;
+                if (computers[i, j] == 0 || i == j) continue;
 
-                if(computers[i, j] == 1)
-                {
-                    dic[i].Add(j);
-                }
+                dic[i].Add(j);
             }
         }
 
         return dic;
-    }
-    
-    private int RemoveSingleNetComsAtDic(Dictionary<int, List<int>> dic)
-    {
-        int singleNetWorkComCount = 0;
-
-        var singleNetWorkComArr = dic.Where(i => i.Value.Count == 0).ToArray();
-
-        foreach (var item in singleNetWorkComArr)
-        {
-            dic.Remove(item.Key);
-
-            singleNetWorkComCount++;
-        }
-
-        return singleNetWorkComCount;
     }
 }
